@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, VARCHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -8,22 +8,38 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
+class User(Base):
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
+    username = Column( String(15), nullable=False, unique=True)
     name = Column(String(250), nullable=False)
+    last_name = Column(String(250), nullable=False)
+    email = Column(VARCHAR(50), nullable=False,primary_key=True,unique=True)
 
-class Address(Base):
-    __tablename__ = 'address'
+class Follower(Base):
+    __tablename__ = 'follower'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user_from_id = Column(Integer, ForeignKey('user.id'))
+    user_to_id = Column(Integer,ForeignKey('user.id'))
+    user = relationship(User)
 
-    def to_dict(self):
-        return {}
+class Post(Base):
+    __tablename__ = 'post'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
+class Comment(Base):
+    __tablename__ = 'comment'
+    id = Column(Integer, primary_key=True)
+    comment_text = Column(VARCHAR(250),nullable=True)
+    author_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+    post_id = Column(Integer,ForeignKey('post.id'))
+    post = relationship(Post)
+    
+
+
 
 ## Draw from SQLAlchemy base
 try:
